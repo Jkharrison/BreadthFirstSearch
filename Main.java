@@ -202,5 +202,5 @@ class BFS
     public TreeSet<GameState> getPath()
     {
         return this.set;
-	}
+    }
 }
