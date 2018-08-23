@@ -21,7 +21,8 @@ public class Main
         // System.out.println(a);
         Board bo = new Board();
         System.out.println(bo);
-        bo.movePiece(10, -1, true);
+        bo.movePiece(10, -1, false); // Should make the board invalid;
+        System.out.println(bo);
         if(bo.validBoard())
         {
             System.out.println("valid board");
@@ -168,6 +169,37 @@ class Board
             return false;
         if(grid[4][4] == false)
             return false;
+        int[] blackNonPerimeterSquares = new int[30];
+        blackNonPerimeterSquares[0] = 1;
+        blackNonPerimeterSquares[1] = 1;
+        blackNonPerimeterSquares[2] = 1;
+        blackNonPerimeterSquares[3] = 2;
+        blackNonPerimeterSquares[4] = 2;
+        blackNonPerimeterSquares[5] = 1;
+        blackNonPerimeterSquares[6] = 7;
+        blackNonPerimeterSquares[7] = 1;
+        blackNonPerimeterSquares[8] = 1;
+        blackNonPerimeterSquares[9] = 8;
+        blackNonPerimeterSquares[10] = 8;
+        blackNonPerimeterSquares[11] = 2;
+        blackNonPerimeterSquares[12] = 1;
+        blackNonPerimeterSquares[13] = 7;
+        blackNonPerimeterSquares[14] = 8;
+        blackNonPerimeterSquares[15] = 1;
+        blackNonPerimeterSquares[16] = 8;
+        blackNonPerimeterSquares[17] = 2;
+        blackNonPerimeterSquares[18] = 8;
+        blackNonPerimeterSquares[19] = 7;
+        blackNonPerimeterSquares[20] = 7;
+        blackNonPerimeterSquares[21] = 8;
+        blackNonPerimeterSquares[22] = 8;
+        blackNonPerimeterSquares[23] = 8;
+        blackNonPerimeterSquares[24] = 3;
+        blackNonPerimeterSquares[25] = 4;
+        blackNonPerimeterSquares[26] = 4;
+        blackNonPerimeterSquares[27] = 3;
+        blackNonPerimeterSquares[28] = 4;
+        blackNonPerimeterSquares[29] = 4;        
         for(int i = 0; i < 10; i++)
         {
             // Just checking the original black squares from the beginning.
@@ -179,6 +211,66 @@ class Board
                 return false;
             if(grid[i][9] == false)
                 return false;
+        }
+        for(int i = 0; i < pieces.length; i++)
+        {
+        	Piece current = pieces[i];
+        	// Loop through piece coordinates, if they match any of the black squares then return false.
+        	// First loop through perimeter pieces and check those easily.
+        	if(current.threeBlock)
+        	{
+        		for(int k = 0; k < 6; k+= 2)
+        		{
+        			int xCord = current.threeCords[k];
+        			int yCord = current.threeCords[k+1];
+        			for(int h = 0; h < 30; h+= 2)
+        			{
+        				if(xCord == blackNonPerimeterSquares[h] && yCord == blackNonPerimeterSquares[h+1])
+        				{
+        					return false;
+        				}
+        			}
+        			for(int h = 0; h < 10; h++)
+        			{
+        				if(xCord == 0 && yCord == h)
+        					return false;
+        				if(xCord == 9 && yCord == h)
+        					return false;
+        				if(xCord == h && yCord == 0)
+        					return false;
+        				if(xCord == h && yCord == 0)
+        					return false;
+        			}
+        		}
+        		
+        	}
+        	else
+        	{
+        		for(int k = 0; k < 8; k+= 2)
+        		{
+        			int xCord = current.fourCords[k];
+        			int yCord = current.fourCords[k+1];
+        			for(int h = 0; h < 30; h+= 2)
+        			{
+        				if(xCord == blackNonPerimeterSquares[h] && yCord == blackNonPerimeterSquares[h+1])
+        				{
+        					return false;
+        				}
+        			}
+        			// TODO: Now do the same as above for the perimeter squares.
+        			for(int h = 0; h < 10; h++)
+        			{
+        				if(xCord == 0 && yCord == h)
+        					return false;
+        				if(xCord == 9 && yCord == h)
+        					return false;
+        				if(xCord == h && yCord == 0)
+        					return false;
+        				if(xCord == h && yCord == 0)
+        					return false;
+        			}
+        		}
+        	}
         }
         for(int i = 0; i < pieces.length; i++)
         {
