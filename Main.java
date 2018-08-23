@@ -20,9 +20,16 @@ public class Main
 //        System.out.println(set + "\n");
         // System.out.println(a);
         Board bo = new Board();
+//        GameState init = new GameState(null);
+//        BFS search = new BFS(init);
+//        TreeSet<GameState> result = search.getPath();
+//        System.out.println(result);
         System.out.println(bo);
-        bo.movePiece(10, -1, false); // Should make the board invalid;
+        bo.movePiece(10, -1, true);
         System.out.println(bo);
+        bo.movePiece(10, -1, true);
+        System.out.println(bo);
+        bo.movePiece(10, -1, true);
         if(bo.validBoard())
         {
             System.out.println("valid board");
@@ -580,20 +587,29 @@ class BFS
 {
     TreeSet<GameState> visited; // main
     TreeSet<GameState> openSet; // FIFO openSet
+    TreeSet<GameState> path;
     static StateComparator comp = new StateComparator(); // Comparator to sort GameStates.
     String result;
-    BFS(GameState init, GameState desired)
+    BFS(GameState init)
     {
+    	// Initialize
         visited = new TreeSet<GameState>(comp);
         openSet = new TreeSet<GameState>(comp);
         openSet.add(init);
         while(!openSet.isEmpty())
         {
         	GameState subtree = openSet.first();
-        	if(subtree == desired)
+        	for(int i = 0; i < 11; i++)
         	{
-        		result = constructPath(subtree);
+        		Piece redInPos = subtree.board.pieces[0];
+        		if((int)redInPos.fourCords[0] == 1 && (int)redInPos.fourCords[1] == 5 && (int)redInPos.fourCords[2] == 1
+        				&& (int)redInPos.fourCords[3] == 6 && (int)redInPos.fourCords[4] == 2 && (int)redInPos.fourCords[5] == 5
+        				&& (int)redInPos.fourCords[6] == 2 && (int)redInPos.fourCords[7] == 6)
+        		{
+        			this.path = openSet;
+        		}
         	}
+        	// TODO: Come back to later.
         }
         // implement BFS for GameState
     }
@@ -614,6 +630,6 @@ class BFS
     }
     public TreeSet<GameState> getPath()
     {
-        return this.openSet;
+        return this.path;
     }
 }
