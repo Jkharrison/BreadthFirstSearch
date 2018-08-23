@@ -21,7 +21,7 @@ public class Main
         // System.out.println(a);
         Board bo = new Board();
         System.out.println(bo);
-        // bo.movePiece(10, -1, false);
+        bo.movePiece(10, -1, true);
         if(bo.validBoard())
         {
             System.out.println("valid board");
@@ -40,7 +40,6 @@ class Board
     {
         pieces = new Piece[11]; // These will all be null at the beginning. Loop and initialize all.
 		grid = new boolean[10][10]; // All are initially false.
-		// TODO: Create some sort of relative position in order to color grid correctly.
         pieces[0] = new Piece(3, 1, 3, 2, 4, 1, 4, 2, 0); 
         pieces[1] = new Piece(5, 1, 6, 1, 6, 2, 1);
         pieces[2] = new Piece(5, 2, 5, 3, 6, 3, 2);
@@ -97,6 +96,27 @@ class Board
         	}
         }
     }
+    void reassignBooleanValues() // Works fine.
+    {
+    	for(int i = 0; i < pieces.length; i++) // Drawing in the colored pieces that aren't black.
+        {
+        	Piece current = pieces[i];
+        	if(current.threeBlock)
+        	{
+        		for(int j = 0; j < 6; j+=2)
+        		{
+        			grid[current.threeCords[j]][current.threeCords[j+1]] = true;
+        		}
+        	}
+        	else
+        	{
+        		for(int j = 0; j < 8; j+= 2)
+        		{
+        			grid[current.fourCords[j]][current.fourCords[j+1]] = true;
+        		}
+        	}
+        }
+    }
     Board(Board b)
     {
         // Note: Deep Copy
@@ -117,6 +137,7 @@ class Board
     boolean validBoard()
     {
         // Checking the original black squares not on perimeter.
+    	// TODO: Update this method, in order for the black squares to not be occupied by another piece
         if(grid[1][1] == false)
             return false;
         if(grid[1][2] == false)
@@ -233,7 +254,7 @@ class Board
     }
     void movePiece(int piece, int movement, boolean horizontal)
     {
-    	if(horizontal)
+    	if(!horizontal)
     	{
     		Piece current = this.pieces[piece];
     		if(current.threeBlock)
@@ -241,6 +262,11 @@ class Board
     			for(int i = 0; i < 6; i += 2)
     			{
     				current.threeCords[i] += movement;
+    			}
+    			for(int k = 0; k < 6; k+=2)
+    			{
+    				System.out.print("Row: " + current.threeCords[k] + " ");
+    				System.out.print("Col: " + current.threeCords[k+1] + "\n");
     			}
     		}
     		else
@@ -260,6 +286,11 @@ class Board
     			{
     				current.threeCords[i] += movement;
     			}
+    			for(int k = 0; k < 6; k+=2)
+    			{
+    				System.out.print("Row: " + current.threeCords[k] + " ");
+    				System.out.print("Col: " + current.threeCords[k+1] + "\n");
+    			}
     		}
     		else
     		{
@@ -269,6 +300,7 @@ class Board
     			}
     		}
     	}
+    	reassignBooleanValues();
     }
     @Override
     public String toString() // String override to print contents of board.
