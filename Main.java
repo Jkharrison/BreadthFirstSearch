@@ -7,14 +7,17 @@ public class Main
         System.out.println("Welcome to my java project");
         StateComparator comp = new StateComparator();
         TreeSet<GameState> set = new TreeSet<GameState>(comp);
-        // set = BFS(GameState init, GameState destination);  
+        // BFS solution = BFS(GameState init, GameState destination);
+        // set = solution.getSet();  
         GameState a = new GameState(null); // What this state is.
         GameState b = new GameState(null); // Destination set.
         a.state[21] = 14;
         b.state[14] = 3;
         set.add(a);
         set.add(b);
-        System.out.println(set);
+        // System.out.println(a);
+        Board bo = new Board();
+        System.out.println(bo);
     }
 }
 class Board
@@ -45,7 +48,7 @@ class Board
         for(int j = 0; j < 10; j++) // left and right side black squares.
         {
             grid[0][j] = true;
-            grid[0][j] = true;
+            grid[9][j] = true;
         }
         // All the black squares that aren't on the perimeter.
         grid[1][1] = true;
@@ -63,23 +66,75 @@ class Board
         grid[8][7] = true;
         grid[8][8] = true;
     }
-    void draw()
-    {
-        // Function to draw board and if drawing in multiple places then invalid state.
-        // Should only draw once per GameState.
-        // Loop to change boolean index values to true if colored square is there.
-        for(int i = 0; i < pieces.length; i++)
-        {
-            // Add true to the locations where there is color.
-            // The rest should remain false.
-        }
-        
-    }
     boolean validBoard()
     {
         draw();
         // Insert Logic.
-        return false;
+        // Checking the original black squares not on perimeter.
+        if(grid[1][1] == false)
+            return false;
+        if(grid[1][2] == false)
+            return false;
+        if(grid[1][7] == false)
+            return false;
+        if(grid[1][8] == false)
+            return false;
+        if(grid[2][1] == false)
+            return false;
+        if(grid[2][8] == false)
+            return false;
+        if(grid[3][4] == false)
+            return false;
+        if(grid[4][3] == false)
+            return false;
+        if(grid[4][4] == false)
+            return false;
+        if(grid[7][8] == false)
+            return false;
+        if(grid[8][1] == false)
+            return false;
+        if(grid[8][2] == false)
+            return false;
+        if(grid[8][7] == false)
+            return false;
+        if(grid[8][8] == false)
+            return false;
+        if(grid[1][1] == false)
+            return false;
+        for(int i = 0; i < 10; i++)
+        {
+            // Just checking the original black squares from the beginning.
+            if(grid[0][i] == false)
+                return false;
+            if(grid[9][i] == false)
+                return false;
+            if(grid[i][0] == false)
+                return false;
+            if(grid[i][9] == false)
+                return false;
+        }
+        return true;
+    }
+    @Override
+    public String toString() // String override to print contents of board.
+    {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 10; i++)
+        {
+            for(int j = 0; j < 10; j++)
+            {
+                if(this.grid[i][j] == true)
+                {
+                    sb.append("X ");
+                }
+                else
+                {
+                    sb.append("  ");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
 class Piece
@@ -112,10 +167,11 @@ class Piece
         this.rightTop = f;
         this.rightMiddle = g;
         this.rightBottom = h;
-	}
+    }
+    @Override
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 		return sb.toString();
 	}
 }
@@ -142,6 +198,10 @@ class GameState
     GameState makeMove(GameState _prev, int movement, boolean horizontal, int piece)
     {
         assert(movement <= 1 && movement >= -1);
+        if(movement > 1)
+            throw new RuntimeException("Movement should not be more than 1");
+        if(movement < -1)
+            throw new RuntimeException("Move should not be less than -1");
         GameState current = new GameState(_prev);
         for(int i = 0; i < 22; i++)
         {
@@ -157,6 +217,7 @@ class GameState
         }
         return current;
     }
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
