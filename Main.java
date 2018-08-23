@@ -298,16 +298,27 @@ class GameState
     {
         prev = _prev;
         state = new byte[22]; // Should be all zeros from init.
+        board = new Board();
         if(_prev != null)
         {
             for(int i = 0; i < 22; i++)
             {
                 state[i] = _prev.state[i];
             }
+            for(int i = 0; i < 10; i++)
+            {
+                for(int j = 0; j < 10; j++)
+                {
+                    this.board.grid[i][j] = _prev.board.grid[i][j];
+                }
+            }
+            for(int i = 0; i < 11; i++)
+            {
+                this.board.pieces[i] = _prev.board.pieces[i];
+            }
         }
         // Add in new move.
         valid = true;
-        // board = new Board(); // This board will have the relative piece locations.
     }
     // TODO: Change switching state algo.
     GameState makeMove(GameState _prev, int movement, boolean horizontal, int piece)
@@ -387,6 +398,6 @@ class BFS
     }
     public TreeSet<GameState> getPath()
     {
-        return this.set;
+        return this.openSet;
     }
 }
