@@ -1,25 +1,27 @@
 import java.util.Comparator;
 import java.util.TreeSet;
+import java.util.LinkedList;
 public class Main
 {
     public static void main(String[] args)
     {
         System.out.println("Welcome to my java project");
-        StateComparator comp = new StateComparator();
-        TreeSet<GameState> set = new TreeSet<GameState>(comp);
+        // StateComparator comp = new StateComparator();
+        // TreeSet<GameState> set = new TreeSet<GameState>(comp);
         // BFS solution = BFS(GameState init, GameState destination);
         // set = solution.getSet();
-        GameState a = new GameState(null); // What this state is.
-        GameState b = new GameState(null); // Destination set.
-        a.state[21] = 14;
-        b.state[14] = 3;
-        set.add(a);
-        set.add(b);
-        System.out.println("TreeSet:");
-        System.out.println(set + "\n");
+//        GameState a = new GameState(null); // What this state is.
+//        GameState b = new GameState(null); // Destination set.
+//        a.state[21] = 14;
+//        b.state[14] = 3;
+//        set.add(a);
+//        set.add(b);
+//        System.out.println("TreeSet:");
+//        System.out.println(set + "\n");
         // System.out.println(a);
         Board bo = new Board();
         System.out.println(bo);
+        // bo.movePiece(10, -1, false);
         if(bo.validBoard())
         {
             System.out.println("valid board");
@@ -39,17 +41,17 @@ class Board
         pieces = new Piece[11]; // These will all be null at the beginning. Loop and initialize all.
 		grid = new boolean[10][10]; // All are initially false.
 		// TODO: Create some sort of relative position in order to color grid correctly.
-        pieces[0] = new Piece(1, 3, 2, 3, 1, 4, 2, 4, 0);
-        pieces[1] = new Piece(1, 5, 1, 6, 2, 6, 1);
-        pieces[2] = new Piece(2, 5, 3, 5, 3, 6, 2);
-        pieces[3] = new Piece(3, 7, 3, 8, 4, 8, 3);
-        pieces[4] = new Piece(4, 7, 5, 7, 5, 8, 4);
-        pieces[5] = new Piece(6, 7, 7, 7, 6, 8, 5);
-        pieces[6] = new Piece(5, 4, 5, 5, 5, 6, 4, 5, 6);
-        pieces[7] = new Piece(6, 4, 6, 5, 6, 6, 7, 5, 7);
-        pieces[8] = new Piece(8, 5, 8, 6, 7, 6, 8);
-        pieces[9] = new Piece(6, 2, 6, 3, 5, 3, 9);
-        pieces[10] = new Piece(3, 1, 6, 1, 5, 2, 10);
+        pieces[0] = new Piece(3, 1, 3, 2, 4, 1, 4, 2, 0); 
+        pieces[1] = new Piece(5, 1, 6, 1, 6, 2, 1);
+        pieces[2] = new Piece(5, 2, 5, 3, 6, 3, 2);
+        pieces[3] = new Piece(7, 3, 8, 3, 8, 4, 3);
+        pieces[4] = new Piece(7, 4, 7, 5, 8, 5, 4);
+        pieces[5] = new Piece(7, 6, 7, 7, 8, 6, 5);
+        pieces[6] = new Piece(4, 5, 5, 5, 6, 5, 5, 4, 6);
+        pieces[7] = new Piece(4, 6, 5, 6, 6, 6, 5, 7, 7);
+        pieces[8] = new Piece(5, 8, 6, 8, 6, 7, 8);
+        pieces[9] = new Piece(2, 6, 3, 6, 3, 5, 9);
+        pieces[10] = new Piece(1, 5, 1, 6, 2, 5, 10);
         for(int i = 0; i < 10; i++) // top and bottom black squares
         {
             grid[i][0] = true;
@@ -70,11 +72,30 @@ class Board
         grid[3][4] = true;
         grid[4][3] = true;
         grid[4][4] = true;
+        grid[7][1] = true;
         grid[7][8] = true;
         grid[8][1] = true;
         grid[8][2] = true;
         grid[8][7] = true;
-        grid[8][8] = true;
+        grid[8][8] = true;       
+        for(int i = 0; i < pieces.length; i++) // Drawing in the colored pieces that aren't black.
+        {
+        	Piece current = pieces[i];
+        	if(current.threeBlock)
+        	{
+        		for(int j = 0; j < 6; j+=2)
+        		{
+        			grid[current.threeCords[j]][current.threeCords[j+1]] = true;
+        		}
+        	}
+        	else
+        	{
+        		for(int j = 0; j < 8; j+= 2)
+        		{
+        			grid[current.fourCords[j]][current.fourCords[j+1]] = true;
+        		}
+        	}
+        }
     }
     Board(Board b)
     {
@@ -100,21 +121,15 @@ class Board
             return false;
         if(grid[1][2] == false)
             return false;
-        if(grid[1][7] == false)
+        if(grid[2][1] == false)
+            return false;
+        if(grid[7][1] == false)
             return false;
         if(grid[1][8] == false)
             return false;
-        if(grid[2][1] == false)
+        if(grid[8][2] == false)
             return false;
-        if(grid[2][8] == false)
-            return false;
-        if(grid[3][4] == false)
-            return false;
-        if(grid[4][3] == false)
-            return false;
-        if(grid[4][4] == false)
-            return false;
-        if(grid[7][8] == false)
+        if(grid[1][7] == false)
             return false;
         if(grid[8][1] == false)
             return false;
@@ -122,9 +137,15 @@ class Board
             return false;
         if(grid[8][7] == false)
             return false;
+        if(grid[7][8] == false)
+            return false;
         if(grid[8][8] == false)
             return false;
-        if(grid[1][1] == false)
+        if(grid[3][4] == false)
+            return false;
+        if(grid[4][3] == false)
+            return false;
+        if(grid[4][4] == false)
             return false;
         for(int i = 0; i < 10; i++)
         {
@@ -210,12 +231,58 @@ class Board
         }
         return true;
     }
+    void movePiece(int piece, int movement, boolean horizontal)
+    {
+    	if(horizontal)
+    	{
+    		Piece current = this.pieces[piece];
+    		if(current.threeBlock)
+    		{
+    			for(int i = 0; i < 6; i += 2)
+    			{
+    				current.threeCords[i] += movement;
+    			}
+    		}
+    		else
+    		{
+    			for(int i = 0; i < 8; i += 2)
+    			{
+    				current.fourCords[i] += movement;
+    			}
+    		}
+    	}
+    	else
+    	{
+    		Piece current = this.pieces[piece];
+    		if(current.threeBlock)
+    		{
+    			for(int i = 1; i < 6; i+= 2)
+    			{
+    				current.threeCords[i] += movement;
+    			}
+    		}
+    		else
+    		{
+    			for(int i = 1; i < 8; i += 2)
+    			{
+    				current.fourCords[i] += movement;
+    			}
+    		}
+    	}
+    }
     @Override
     public String toString() // String override to print contents of board.
     {
         StringBuilder sb = new StringBuilder();
+        System.out.print("  ");
         for(int i = 0; i < 10; i++)
         {
+        	System.out.print(i + " ");
+        }
+        System.out.println();
+        for(int i = 0; i < 10; i++)
+        {
+        	sb.append(i + " ");
             for(int j = 0; j < 10; j++)
             {
                 if(this.grid[i][j] == true)
@@ -358,9 +425,9 @@ class GameState
     public boolean invalidState()
     {
     	// TODO: Write function for both static standpoint and object standpoint.
-    	GameState current = this;
-    	return false; // Placeholder for now
+    	return this.board.validBoard();
     }
+    // FIXME: This may or may not be needed in the future.
     public static boolean invalidState(GameState gs)
     {
         // Draw the board for the input state, and if valid return true.
@@ -387,14 +454,39 @@ class StateComparator implements Comparator<GameState>
 }
 class BFS
 {
-    TreeSet<GameState> closedSet;
-    TreeSet<GameState> openSet;
-    static StateComparator comp = new StateComparator();
+    TreeSet<GameState> visited; // main
+    TreeSet<GameState> openSet; // FIFO openSet
+    static StateComparator comp = new StateComparator(); // Comparator to sort GameStates.
+    String result;
     BFS(GameState init, GameState desired)
     {
-        closedSet = new TreeSet<GameState>(comp);
-        openSet = new TreeSet<GameState>();
+        visited = new TreeSet<GameState>(comp);
+        openSet = new TreeSet<GameState>(comp);
+        openSet.add(init);
+        while(!openSet.isEmpty())
+        {
+        	GameState subtree = openSet.first();
+        	if(subtree == desired)
+        	{
+        		result = constructPath(subtree);
+        	}
+        }
         // implement BFS for GameState
+    }
+    // Function to get LinkedList of GameState path to goal.
+    LinkedList<GameState> getSuccessors(GameState subState)
+    {
+    	LinkedList<GameState> successors = new LinkedList<GameState>();
+    	while(subState.prev != null)
+    	{
+    		successors.add(subState.prev);
+    		subState = subState.prev;
+    	}
+    	return successors;
+    }
+    String constructPath(GameState gs)
+    {
+    	return " ";
     }
     public TreeSet<GameState> getPath()
     {
