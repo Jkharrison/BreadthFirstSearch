@@ -1,6 +1,7 @@
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.LinkedList;
+// TODO: Mechanics of the game are complete.
 public class Main
 {
     public static void main(String[] args)
@@ -145,7 +146,6 @@ class Board
     boolean validBoard()
     {
         // Checking the original black squares not on perimeter.
-    	// TODO: Update this method, in order for the black squares to not be occupied by another piece
         if(grid[1][1] == false)
             return false;
         if(grid[1][2] == false)
@@ -264,7 +264,6 @@ class Board
         					return false;
         				}
         			}
-        			// TODO: Now do the same as above for the perimeter squares.
         			for(int h = 0; h < 10; h++)
         			{
         				if(xCord == 0 && yCord == h)
@@ -516,7 +515,7 @@ class GameState
             }
         }
         // Add in new move.
-        valid = true;
+        valid = board.validBoard();
     }
     // TODO: Change switching state algo.
     GameState makeMove(GameState _prev, int movement, boolean horizontal, int piece)
@@ -553,21 +552,21 @@ class GameState
         sb.append(this.state[21] + "\n");
         return sb.toString();
     }
-    public boolean invalidState()
+    public boolean validState()
     {
     	// TODO: Write function for both static standpoint and object standpoint.
     	return this.board.validBoard();
     }
     // FIXME: This may or may not be needed in the future.
-    public static boolean invalidState(GameState gs)
-    {
-        // Draw the board for the input state, and if valid return true.
-    	// Change the center x, y based off the bytes.
-    	// TODO: Gabe's Idea, write one board(static) and update it with the byte state array.
-        if(gs.board.validBoard())
-            return true;
-        return false; // If GameState is false, move backwards or cannot make move.
-    }
+//    public static boolean invalidState(GameState gs)
+//    {
+//        // Draw the board for the input state, and if valid return true.
+//    	// Change the center x, y based off the bytes.
+//    	// TODO: Gabe's Idea, write one board(static) and update it with the byte state array.
+//        if(gs.board.validBoard())
+//            return true;
+//        return false; // If GameState is false, move backwards or cannot make move.
+//    }
 }
 class StateComparator implements Comparator<GameState>
 {
@@ -586,7 +585,7 @@ class StateComparator implements Comparator<GameState>
 class BFS
 {
     TreeSet<GameState> visited; // main
-    TreeSet<GameState> openSet; // FIFO openSet
+    TreeSet<GameState> openSet; // FIFO openSet, will be the set with the correct solution.
     TreeSet<GameState> path;
     static StateComparator comp = new StateComparator(); // Comparator to sort GameStates.
     String result;
@@ -602,15 +601,21 @@ class BFS
         	for(int i = 0; i < 11; i++)
         	{
         		Piece redInPos = subtree.board.pieces[0];
+        		
         		if((int)redInPos.fourCords[0] == 1 && (int)redInPos.fourCords[1] == 5 && (int)redInPos.fourCords[2] == 1
         				&& (int)redInPos.fourCords[3] == 6 && (int)redInPos.fourCords[4] == 2 && (int)redInPos.fourCords[5] == 5
         				&& (int)redInPos.fourCords[6] == 2 && (int)redInPos.fourCords[7] == 6)
         		{
         			this.path = openSet;
+        			break;
         		}
+        		// TODO: Try each of the different 4 moves for each piece
+        		// Piece current = subtree.board.pieces[i];
+        		// Try to move the current piece up, down, left, and right.
         	}
-        	// TODO: Come back to later.
+        		// TODO: Come back to later.
         }
+        
         // implement BFS for GameState
     }
     // Function to get LinkedList of GameState path to goal.
