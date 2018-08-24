@@ -619,13 +619,13 @@ class BFS
         // implement BFS for GameState
     }
     // Function to get LinkedList of GameState path to goal.
-    LinkedList<GameState> getSuccessors(GameState subState)
+    LinkedList<GameState> getSuccessors(GameState leafState)
     {
     	LinkedList<GameState> successors = new LinkedList<GameState>();
-    	while(subState.prev != null)
+    	while(leafState.prev != null)
     	{
-    		successors.add(subState.prev);
-    		subState = subState.prev;
+    		successors.add(leafState.prev);
+    		leafState = leafState.prev;
     	}
     	return successors;
     }
