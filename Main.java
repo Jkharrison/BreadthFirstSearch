@@ -21,13 +21,14 @@ public class Main
         // bw.close();
         System.out.println("Welcome to my Java Breadth First Search project");
    	    GameState init = new GameState();
-
+        // if(init.validBoard())
+        // {
+        //     System.out.println("Valid");
+        // }
         LinkedList<GameState> result = BFS(init);
         System.out.println(result.size());
         for(int i = 0; i < result.size(); i++)
-        {
             System.out.println(result.get(i).stateToString());
-        }
         System.out.println("Algorithm is finished");
     }
     public static LinkedList<GameState> BFS(GameState init)
@@ -42,6 +43,8 @@ public class Main
     	{
     		//System.out.println("Candidates size: " + candidates.size());
     		GameState subtree = candidates.poll(); // dequeue
+            if(!subtree.validBoard())
+                throw new RuntimeException("This is broken, invalid states in queue.");
             //System.out.println("Pop: " + subtree.stateToString());
     		if(subtree.state[0] == 4 && subtree.state[1] == -2)
     		{
@@ -49,87 +52,52 @@ public class Main
     			System.out.println("Solution has been found, congratulations");
     			break;
     		}
-            if(subtree.state[0] == 1)
-            {
-                System.out.println("Getting close, red piece has moved 1 to the left");
-            }
-            if(subtree.state[1] == -1)
-            {
-                System.out.println("Getting close, red piece has moved 1 up");
-            }
-            if(subtree.state[20] == -2 && subtree.state[21] == 0 && subtree.state[19] == -1 && subtree.state[15] == -1)
-            {
-                // optimalPath = subtree.getSuccessors();
-                // System.out.println("Orange piece was moved to the right twice, and once down.");
-                // break;
-            }
     		for(int i = 0; i < 11; i++)
     		{
     			// System.out.println("Checking Piece " + i);
                 //System.out.println("Piece " + i + " " + subtree.board.pieces[i]);
+                //System.out.println(subtree.printWithMoves());
+                //System.out.println(subtree.stateToString());
                 GameState left = new GameState(subtree, -1, true, i);
-    			if(visited.contains(left))
-                {
-                    // System.out.println("Found in visisted set");
-                    // System.out.println(left.stateToString());
-    				continue;
-                }
-    			else if(left.validBoard())
+                //System.out.println(left.stateToString());
+                //System.exit(0);
+    			if(left.validBoard() && !visited.contains(left))
     			{
     				//System.out.println("Valid move for piece " + i + " to the left");
                     //System.out.println(move.stateToString());
                     //System.out.println("Push: " + left.stateToString());
     				candidates.add(left);
-    				//visited.add(left);
+    				visited.add(left);
     			}
                 GameState right = new GameState(subtree, 1, true, i);
-    			if(visited.contains(right))
-                {
-                    // System.out.println("Found in visisted set");
-                    // System.out.println(right.stateToString());
-    				continue;
-                }
-    			else if(right.validBoard())
+    			if(right.validBoard() && !visited.contains(right))
     			{
     				//System.out.println("Valid move for piece " + i + " to the right");
                     //System.out.println(move.stateToString());
                     //System.out.println("Push: " + right.stateToString());
     				candidates.add(right);
-    				//visited.add(right);
+    				visited.add(right);
     			}
                 GameState up = new GameState(subtree, -1, false, i);
-    			if(visited.contains(up))
-                {
-                    // System.out.println("Found in visited set");
-                    // System.out.println(up.stateToString());
-    				continue;
-                }
-    			else if(up.validBoard())
+    			if(up.validBoard() && !visited.contains(up))
     			{
     				//System.out.println("Valid move for piece " + i + " up");
                     //System.out.println(move.stateToString());
                     //System.out.println("Push: " + up.stateToString());
     				candidates.add(up);
-    				//visited.add(up);
+    				visited.add(up);
     			}
                 GameState down = new GameState(subtree, 1, false, i);
-    			if(visited.contains(down))
-                {
-                    // System.out.println("Found in visited set");
-                    // System.out.println(down.stateToString());
-    				continue;
-                }
-    			else if(down.validBoard())
+    			if(down.validBoard() && !visited.contains(down))
     			{
     				//System.out.println("Valid move for piece " + i + " down");
                     //System.out.println(move.stateToString());
                     //System.out.println("Push: " + down.stateToString());
     				candidates.add(down);
-    				//visited.add(down);
+    				visited.add(down);
     			}
     		}
-            //System.out.println();
-    		visited.add(subtree);
+    		//visited.add(subtree);
     	}
     	return optimalPath;
     }
@@ -253,6 +221,8 @@ class GameState
                 state[i] = _prev.state[i];
             }
         }
+        else
+            throw new RuntimeException("Use default constructor instead of this one");
     }
     GameState(GameState _prev, int movement, boolean horizontal, int piece)
     {
@@ -265,16 +235,12 @@ class GameState
                 state[i] = _prev.state[i];
             }
         }
-        if(horizontal)
-        {
-            state[piece*2] += movement;
-            //board.movePiece(piece, movement, horizontal);
-        }
         else
-        {
+            throw new RuntimeException("Use default constructor instead of this one");
+        if(horizontal)
+            state[piece*2] += movement;
+        else
             state[(piece*2) + 1] += movement;
-            //board.movePiece(piece, movement, horizontal);
-        }
     }
     boolean validBoard()
     {
@@ -320,13 +286,9 @@ class GameState
         			int row = current.threeCords[j] + this.state[i * 2 + 1];
         			int col = current.threeCords[j + 1] + this.state[i * 2];
         			if(board.gridChecker[row][col] == false)
-        			{
         				board.gridChecker[row][col] = true;
-        			}
         			else if(board.gridChecker[row][col] == true)
-        			{
         				return false;
-        			}
         		}
         	}
         	else
@@ -339,9 +301,7 @@ class GameState
         			if(board.gridChecker[row][col] == false)
         				board.gridChecker[row][col] = true;
         			else
-                    {
         				return false;
-                    }
         		}
         	}
         }
@@ -370,12 +330,11 @@ class GameState
     }
     public LinkedList<GameState> getSuccessors()
     {
-    	// StateComparator comp = new StateComparator();
     	GameState current = this;
     	LinkedList<GameState> returnSet = new LinkedList<GameState>();
     	while(current.prev != null)
     	{
-    		System.out.println("Addding Successors");
+    		//System.out.println("Addding Successors");
     		returnSet.add(current);
     		current = current.prev;
     	}
@@ -414,11 +373,9 @@ class GameState
         StringBuilder sb = new StringBuilder();
         sb.append("State values: ");
         for(int i = 0; i < 21; i++)
-        {
             sb.append(this.state[i] + ", ");
-        }
         sb.append(this.state[21] + "\n");
-        sb.append(this.board + "\n");
+        sb.append(board + "\n");
         return sb.toString();
     }
 }
