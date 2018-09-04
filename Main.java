@@ -1,432 +1,157 @@
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.LinkedList;
-// TODO: Mechanics of the game are complete.
+import java.util.Queue;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 public class Main
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws IOException
     {
-        System.out.println("Welcome to my java project");
-        // StateComparator comp = new StateComparator();
-        // TreeSet<GameState> set = new TreeSet<GameState>(comp);
-        // BFS solution = BFS(GameState init, GameState destination);
-        // set = solution.getSet();
-//        GameState a = new GameState(null); // What this state is.
-//        GameState b = new GameState(null); // Destination set.
-//        a.state[21] = 14;
-//        b.state[14] = 3;
-//        set.add(a);
-//        set.add(b);
-//        System.out.println("TreeSet:");
-//        System.out.println(set + "\n");
-        // System.out.println(a);
-        Board bo = new Board();
-//        GameState init = new GameState(null);
-//        BFS search = new BFS(init);
-//        TreeSet<GameState> result = search.getPath();
-//        System.out.println(result);
-        System.out.println(bo);
-        bo.movePiece(10, -1, true);
-        System.out.println(bo);
-        bo.movePiece(10, -1, true);
-        System.out.println(bo);
-        bo.movePiece(10, -1, true);
-        if(bo.validBoard())
+        // File file = new File("Solution.txt");
+        // if(!file.exists())
+        // {
+        //     file.createNewFile();
+        // }
+        // FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        // BufferedWriter bw = new BufferedWriter(fw);
+        // bw.write(init.stateToString());
+        // bw.close();
+        System.out.println("Welcome to my Java Breadth First Search project");
+   	    GameState init = new GameState();
+
+        LinkedList<GameState> result = BFS(init);
+        System.out.println(result.size());
+        for(int i = 0; i < result.size(); i++)
         {
-            System.out.println("valid board");
+            System.out.println(result.get(i).stateToString());
         }
-        else
-        {
-            System.out.println("invalid board");
-        }
+        System.out.println("Algorithm is finished");
+    }
+    public static LinkedList<GameState> BFS(GameState init)
+    {
+    	StateComparator comp = new StateComparator();
+    	TreeSet<GameState> visited = new TreeSet<GameState>(comp); // Closed set
+    	Queue<GameState> candidates = new LinkedList<GameState>(); // Open Set(FIFO)
+    	LinkedList<GameState> optimalPath = new LinkedList<GameState>(); // Result List. Should have 115 different GameStates.
+    	candidates.add(init); // queue.add()
+    	visited.add(init);
+    	while(!candidates.isEmpty())
+    	{
+    		//System.out.println("Candidates size: " + candidates.size());
+    		GameState subtree = candidates.poll(); // dequeue
+            //System.out.println("Pop: " + subtree.stateToString());
+    		if(subtree.state[0] == 4 && subtree.state[1] == -2)
+    		{
+    			optimalPath = subtree.getSuccessors();
+    			System.out.println("Solution has been found, congratulations");
+    			break;
+    		}
+            if(subtree.state[0] == 1)
+            {
+                System.out.println("Getting close, red piece has moved 1 to the left");
+            }
+            if(subtree.state[1] == -1)
+            {
+                System.out.println("Getting close, red piece has moved 1 up");
+            }
+            if(subtree.state[20] == -2 && subtree.state[21] == 0 && subtree.state[19] == -1 && subtree.state[15] == -1)
+            {
+                // optimalPath = subtree.getSuccessors();
+                // System.out.println("Orange piece was moved to the right twice, and once down.");
+                // break;
+            }
+    		for(int i = 0; i < 11; i++)
+    		{
+    			// System.out.println("Checking Piece " + i);
+                //System.out.println("Piece " + i + " " + subtree.board.pieces[i]);
+                GameState left = new GameState(subtree, -1, true, i);
+    			if(visited.contains(left))
+                {
+                    // System.out.println("Found in visisted set");
+                    // System.out.println(left.stateToString());
+    				continue;
+                }
+    			else if(left.validBoard())
+    			{
+    				//System.out.println("Valid move for piece " + i + " to the left");
+                    //System.out.println(move.stateToString());
+                    //System.out.println("Push: " + left.stateToString());
+    				candidates.add(left);
+    				//visited.add(left);
+    			}
+                GameState right = new GameState(subtree, 1, true, i);
+    			if(visited.contains(right))
+                {
+                    // System.out.println("Found in visisted set");
+                    // System.out.println(right.stateToString());
+    				continue;
+                }
+    			else if(right.validBoard())
+    			{
+    				//System.out.println("Valid move for piece " + i + " to the right");
+                    //System.out.println(move.stateToString());
+                    //System.out.println("Push: " + right.stateToString());
+    				candidates.add(right);
+    				//visited.add(right);
+    			}
+                GameState up = new GameState(subtree, -1, false, i);
+    			if(visited.contains(up))
+                {
+                    // System.out.println("Found in visited set");
+                    // System.out.println(up.stateToString());
+    				continue;
+                }
+    			else if(up.validBoard())
+    			{
+    				//System.out.println("Valid move for piece " + i + " up");
+                    //System.out.println(move.stateToString());
+                    //System.out.println("Push: " + up.stateToString());
+    				candidates.add(up);
+    				//visited.add(up);
+    			}
+                GameState down = new GameState(subtree, 1, false, i);
+    			if(visited.contains(down))
+                {
+                    // System.out.println("Found in visited set");
+                    // System.out.println(down.stateToString());
+    				continue;
+                }
+    			else if(down.validBoard())
+    			{
+    				//System.out.println("Valid move for piece " + i + " down");
+                    //System.out.println(move.stateToString());
+                    //System.out.println("Push: " + down.stateToString());
+    				candidates.add(down);
+    				//visited.add(down);
+    			}
+    		}
+            //System.out.println();
+    		visited.add(subtree);
+    	}
+    	return optimalPath;
     }
 }
 class Board
 {
-    boolean grid[][];
-    Piece[] pieces;
+    static Piece[] pieces = new Piece[11];
+    static boolean[][] gridChecker = new boolean[10][10];
+
     Board()
     {
-        pieces = new Piece[11]; // These will all be null at the beginning. Loop and initialize all.
-		grid = new boolean[10][10]; // All are initially false.
-        pieces[0] = new Piece(3, 1, 3, 2, 4, 1, 4, 2, 0); 
+        pieces[0] = new Piece(3, 1, 3, 2, 4, 1, 4, 2, 0);
         pieces[1] = new Piece(5, 1, 6, 1, 6, 2, 1);
         pieces[2] = new Piece(5, 2, 5, 3, 6, 3, 2);
         pieces[3] = new Piece(7, 3, 8, 3, 8, 4, 3);
         pieces[4] = new Piece(7, 4, 7, 5, 8, 5, 4);
         pieces[5] = new Piece(7, 6, 7, 7, 8, 6, 5);
-        pieces[6] = new Piece(4, 5, 5, 5, 6, 5, 5, 4, 6);
-        pieces[7] = new Piece(4, 6, 5, 6, 6, 6, 5, 7, 7);
-        pieces[8] = new Piece(5, 8, 6, 8, 6, 7, 8);
-        pieces[9] = new Piece(2, 6, 3, 6, 3, 5, 9);
+        pieces[6] = new Piece(4, 5, 5, 4, 5, 5, 6, 5, 6);
+        pieces[7] = new Piece(4, 6, 5, 6, 5, 7, 6, 6, 7);
+        pieces[8] = new Piece(5, 8, 6, 7, 6, 8, 8);
+        pieces[9] = new Piece(2, 6, 3, 5, 3, 6, 9);
         pieces[10] = new Piece(1, 5, 1, 6, 2, 5, 10);
-        for(int i = 0; i < 10; i++) // top and bottom black squares
-        {
-            grid[i][0] = true;
-            grid[i][9] = true;
-        }
-        for(int j = 0; j < 10; j++) // left and right side black squares.
-        {
-            grid[0][j] = true;
-            grid[9][j] = true;
-        }
-        // All the black squares that aren't on the perimeter.
-        grid[1][1] = true;
-        grid[1][2] = true;
-        grid[1][7] = true;
-        grid[1][8] = true;
-        grid[2][1] = true;
-        grid[2][8] = true;
-        grid[3][4] = true;
-        grid[4][3] = true;
-        grid[4][4] = true;
-        grid[7][1] = true;
-        grid[7][8] = true;
-        grid[8][1] = true;
-        grid[8][2] = true;
-        grid[8][7] = true;
-        grid[8][8] = true;       
-        for(int i = 0; i < pieces.length; i++) // Drawing in the colored pieces that aren't black.
-        {
-        	Piece current = pieces[i];
-        	if(current.threeBlock)
-        	{
-        		for(int j = 0; j < 6; j+=2)
-        		{
-        			grid[current.threeCords[j]][current.threeCords[j+1]] = true;
-        		}
-        	}
-        	else
-        	{
-        		for(int j = 0; j < 8; j+= 2)
-        		{
-        			grid[current.fourCords[j]][current.fourCords[j+1]] = true;
-        		}
-        	}
-        }
-    }
-    void reassignBooleanValues() // Works fine.
-    {
-    	for(int i = 0; i < pieces.length; i++) // Drawing in the colored pieces that aren't black.
-        {
-        	Piece current = pieces[i];
-        	if(current.threeBlock)
-        	{
-        		for(int j = 0; j < 6; j+=2)
-        		{
-        			grid[current.threeCords[j]][current.threeCords[j+1]] = true;
-        		}
-        	}
-        	else
-        	{
-        		for(int j = 0; j < 8; j+= 2)
-        		{
-        			grid[current.fourCords[j]][current.fourCords[j+1]] = true;
-        		}
-        	}
-        }
-    }
-    Board(Board b)
-    {
-        // Note: Deep Copy
-        this.grid = new boolean[10][10];
-        this.pieces = new Piece[11];
-        for(int i = 0; i < 10; i++)
-        {
-            for(int j = 0; j < 10; j++)
-            {
-                this.grid[i][j] = b.grid[i][j];
-            }
-        }
-        for(int i = 0; i < 11; i++)
-        {
-            this.pieces[i] = b.pieces[i];
-        }
-    }
-    boolean validBoard()
-    {
-        // Checking the original black squares not on perimeter.
-        if(grid[1][1] == false)
-            return false;
-        if(grid[1][2] == false)
-            return false;
-        if(grid[2][1] == false)
-            return false;
-        if(grid[7][1] == false)
-            return false;
-        if(grid[1][8] == false)
-            return false;
-        if(grid[8][2] == false)
-            return false;
-        if(grid[1][7] == false)
-            return false;
-        if(grid[8][1] == false)
-            return false;
-        if(grid[8][2] == false)
-            return false;
-        if(grid[8][7] == false)
-            return false;
-        if(grid[7][8] == false)
-            return false;
-        if(grid[8][8] == false)
-            return false;
-        if(grid[3][4] == false)
-            return false;
-        if(grid[4][3] == false)
-            return false;
-        if(grid[4][4] == false)
-            return false;
-        int[] blackNonPerimeterSquares = new int[30];
-        blackNonPerimeterSquares[0] = 1;
-        blackNonPerimeterSquares[1] = 1;
-        blackNonPerimeterSquares[2] = 1;
-        blackNonPerimeterSquares[3] = 2;
-        blackNonPerimeterSquares[4] = 2;
-        blackNonPerimeterSquares[5] = 1;
-        blackNonPerimeterSquares[6] = 7;
-        blackNonPerimeterSquares[7] = 1;
-        blackNonPerimeterSquares[8] = 1;
-        blackNonPerimeterSquares[9] = 8;
-        blackNonPerimeterSquares[10] = 8;
-        blackNonPerimeterSquares[11] = 2;
-        blackNonPerimeterSquares[12] = 1;
-        blackNonPerimeterSquares[13] = 7;
-        blackNonPerimeterSquares[14] = 8;
-        blackNonPerimeterSquares[15] = 1;
-        blackNonPerimeterSquares[16] = 8;
-        blackNonPerimeterSquares[17] = 2;
-        blackNonPerimeterSquares[18] = 8;
-        blackNonPerimeterSquares[19] = 7;
-        blackNonPerimeterSquares[20] = 7;
-        blackNonPerimeterSquares[21] = 8;
-        blackNonPerimeterSquares[22] = 8;
-        blackNonPerimeterSquares[23] = 8;
-        blackNonPerimeterSquares[24] = 3;
-        blackNonPerimeterSquares[25] = 4;
-        blackNonPerimeterSquares[26] = 4;
-        blackNonPerimeterSquares[27] = 3;
-        blackNonPerimeterSquares[28] = 4;
-        blackNonPerimeterSquares[29] = 4;        
-        for(int i = 0; i < 10; i++)
-        {
-            // Just checking the original black squares from the beginning.
-            if(grid[0][i] == false)
-                return false;
-            if(grid[9][i] == false)
-                return false;
-            if(grid[i][0] == false)
-                return false;
-            if(grid[i][9] == false)
-                return false;
-        }
-        for(int i = 0; i < pieces.length; i++)
-        {
-        	Piece current = pieces[i];
-        	// Loop through piece coordinates, if they match any of the black squares then return false.
-        	// First loop through perimeter pieces and check those easily.
-        	if(current.threeBlock)
-        	{
-        		for(int k = 0; k < 6; k+= 2)
-        		{
-        			int xCord = current.threeCords[k];
-        			int yCord = current.threeCords[k+1];
-        			for(int h = 0; h < 30; h+= 2)
-        			{
-        				if(xCord == blackNonPerimeterSquares[h] && yCord == blackNonPerimeterSquares[h+1])
-        				{
-        					return false;
-        				}
-        			}
-        			for(int h = 0; h < 10; h++)
-        			{
-        				if(xCord == 0 && yCord == h)
-        					return false;
-        				if(xCord == 9 && yCord == h)
-        					return false;
-        				if(xCord == h && yCord == 0)
-        					return false;
-        				if(xCord == h && yCord == 0)
-        					return false;
-        			}
-        		}
-        		
-        	}
-        	else
-        	{
-        		for(int k = 0; k < 8; k+= 2)
-        		{
-        			int xCord = current.fourCords[k];
-        			int yCord = current.fourCords[k+1];
-        			for(int h = 0; h < 30; h+= 2)
-        			{
-        				if(xCord == blackNonPerimeterSquares[h] && yCord == blackNonPerimeterSquares[h+1])
-        				{
-        					return false;
-        				}
-        			}
-        			for(int h = 0; h < 10; h++)
-        			{
-        				if(xCord == 0 && yCord == h)
-        					return false;
-        				if(xCord == 9 && yCord == h)
-        					return false;
-        				if(xCord == h && yCord == 0)
-        					return false;
-        				if(xCord == h && yCord == 0)
-        					return false;
-        			}
-        		}
-        	}
-        }
-        for(int i = 0; i < pieces.length; i++)
-        {
-            Piece current = pieces[i];
-            for(int j = i+1; j < pieces.length; j++)
-            {
-                Piece comp = pieces[j];
-                if(current.threeBlock && comp.threeBlock)
-                {
-                    // Case where the two are both 3 blocks
-                    for(int h = 0; h < 6; h+= 2)
-                    {
-                        int x = current.threeCords[h];
-                        int y = current.threeCords[h+1];
-                        for(int k = 0; k < 6; k+= 2)
-                        {
-                            int compX = comp.threeCords[k];
-                            int compY = comp.threeCords[k+1];
-                            if(x == compX && y == compY)
-                                return false;
-                        }
-                    }
-                }
-                else if(!current.threeBlock && !comp.threeBlock)
-                {
-                    // case where the two are both 4 blocks.
-                    for(int h = 0; h < 8; h+= 2)
-                    {
-                        int x = current.fourCords[h];
-                        int y = current.fourCords[h+1];
-                        for(int k = 0; k < 8; k+= 2)
-                        {
-                            int compX = comp.fourCords[k];
-                            int compY = comp.fourCords[k+1];
-                            if(x == compX && y == compY)
-                                return false;
-                        }
-                    }
-                }
-                else if(current.threeBlock && !comp.threeBlock)
-                {
-                    for(int h = 0; h < 6; h+= 2)
-                    {
-                        int x = current.threeCords[h];
-                        int y = current.threeCords[h+1];
-                        for(int k = 0; k < 8; k += 2)
-                        {
-                            int compX = comp.fourCords[k];
-                            int compY = comp.fourCords[k+1];
-                            if(x == compX && y == compY)
-                                return false;
-                        }
-                    }
-                }
-                else
-                {
-                    for(int h = 0; h < 8; h+= 2)
-                    {
-                        int x = current.fourCords[h];
-                        int y = current.fourCords[h+1];
-                        for(int k = 0; k < 6; k+= 2)
-                        {
-                            int compX = comp.threeCords[k];
-                            int compY = comp.threeCords[k+1];
-                            if(x == compX && y == compY)
-                                return false;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    void movePiece(int piece, int movement, boolean horizontal)
-    {
-    	if(!horizontal)
-    	{
-    		Piece current = this.pieces[piece];
-    		if(current.threeBlock)
-    		{
-    			for(int i = 0; i < 6; i += 2)
-    			{
-    				current.threeCords[i] += movement;
-    			}
-    			for(int k = 0; k < 6; k+=2)
-    			{
-    				System.out.print("Row: " + current.threeCords[k] + " ");
-    				System.out.print("Col: " + current.threeCords[k+1] + "\n");
-    			}
-    		}
-    		else
-    		{
-    			for(int i = 0; i < 8; i += 2)
-    			{
-    				current.fourCords[i] += movement;
-    			}
-    		}
-    	}
-    	else
-    	{
-    		Piece current = this.pieces[piece];
-    		if(current.threeBlock)
-    		{
-    			for(int i = 1; i < 6; i+= 2)
-    			{
-    				current.threeCords[i] += movement;
-    			}
-    			for(int k = 0; k < 6; k+=2)
-    			{
-    				System.out.print("Row: " + current.threeCords[k] + " ");
-    				System.out.print("Col: " + current.threeCords[k+1] + "\n");
-    			}
-    		}
-    		else
-    		{
-    			for(int i = 1; i < 8; i += 2)
-    			{
-    				current.fourCords[i] += movement;
-    			}
-    		}
-    	}
-    	reassignBooleanValues();
-    }
-    @Override
-    public String toString() // String override to print contents of board.
-    {
-        StringBuilder sb = new StringBuilder();
-        System.out.print("  ");
-        for(int i = 0; i < 10; i++)
-        {
-        	System.out.print(i + " ");
-        }
-        System.out.println();
-        for(int i = 0; i < 10; i++)
-        {
-        	sb.append(i + " ");
-            for(int j = 0; j < 10; j++)
-            {
-                if(this.grid[i][j] == true)
-                {
-                    sb.append("X ");
-                }
-                else
-                {
-                    sb.append("  ");
-                }
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
     }
 }
 class Piece
@@ -434,11 +159,9 @@ class Piece
     byte[] threeCords;
     byte[] fourCords;
     boolean threeBlock;
-    int number;
     // 3 block piece
     Piece(int a, int b, int c, int d, int e, int f, int n)
     {
-        this.number = n;
         this.threeBlock = true;
         threeCords = new byte[6];
         threeCords[0] = (byte)a;
@@ -448,10 +171,8 @@ class Piece
         threeCords[4] = (byte)e;
         threeCords[5] = (byte)f;
     }
-    // 4 block piece
     Piece(int a, int b, int c, int d, int e, int f, int g, int h, int n)
     {
-        this.number = n;
         this.threeBlock = false;
         fourCords = new byte[8];
         fourCords[0] = (byte)a;
@@ -463,82 +184,229 @@ class Piece
         fourCords[6] = (byte)g;
         fourCords[7] = (byte)h;
     }
-    int getPieceNumber()
+    Piece(Piece p) // Copy Constructor
     {
-        return this.number;
+    	this.threeBlock = p.threeBlock;
+    	if(p.threeBlock)
+    	{
+    		this.threeCords = new byte[6];
+    		for(int i = 0; i < threeCords.length; i++)
+    		{
+    			this.threeCords[i] = p.threeCords[i];
+    		}
+    	}
+    	else
+    	{
+    		this.fourCords = new byte[8];
+    		for(int i = 0; i < fourCords.length; i++)
+    		{
+    			this.fourCords[i] = p.fourCords[i];
+    		}
+    	}
+
     }
     @Override
 	public String toString()
 	{
         StringBuilder sb = new StringBuilder();
+        if(this.threeBlock)
+        {
+        	for(int i = 0; i < 6; i+=2)
+        	{
+        		sb.append("(" + threeCords[i] + ", " + threeCords[i+1] + ") ");
+        	}
+        	sb.append("\n");
+        }
+        else
+        {
+        	for(int i = 0; i < 8; i++)
+        	{
+        		if(i % 2 == 0)
+        			sb.append("(" + fourCords[i] + ", ");
+        		else
+        			sb.append(fourCords[i] + ")" );
+        	}
+        	sb.append("\n");
+        }
 		return sb.toString();
-    }
-    void movePiece(int movement, boolean horizontal)
-    {
-        // TODO: Come back to this soon.
     }
 }
 class GameState
 {
     GameState prev;
     byte[] state;
-    boolean valid;
-    Board board;
+    static Board board;
     GameState()
     {
         this.prev = null;
         state = new byte[22];
-        valid = true;
         board = new Board();
     }
     GameState(GameState _prev)
     {
         prev = _prev;
         state = new byte[22]; // Should be all zeros from init.
-        board = new Board();
         if(_prev != null)
         {
             for(int i = 0; i < 22; i++)
             {
                 state[i] = _prev.state[i];
             }
-            for(int i = 0; i < 10; i++)
-            {
-                for(int j = 0; j < 10; j++)
-                {
-                    this.board.grid[i][j] = _prev.board.grid[i][j];
-                }
-            }
-            for(int i = 0; i < 11; i++)
-            {
-                this.board.pieces[i] = _prev.board.pieces[i];
-            }
         }
-        // Add in new move.
-        valid = board.validBoard();
     }
-    // TODO: Change switching state algo.
-    GameState makeMove(GameState _prev, int movement, boolean horizontal, int piece)
+    GameState(GameState _prev, int movement, boolean horizontal, int piece)
     {
-        assert(movement <= 1 && movement >= -1);
-        if(movement > 1)
-            throw new RuntimeException("Movement should not be more than 1");
-        if(movement < -1)
-            throw new RuntimeException("Move should not be less than -1");
-        GameState current = new GameState(_prev);
-        for(int i = 0; i < 22; i++)
+        prev = _prev;
+        state = new byte[22];
+        if(_prev!= null)
         {
-            current.state[i] = _prev.state[i];
+            for(int i = 0; i < 22; i++)
+            {
+                state[i] = _prev.state[i];
+            }
         }
         if(horizontal)
         {
-            current.state[piece] += movement;
+            state[piece*2] += movement;
+            //board.movePiece(piece, movement, horizontal);
         }
         else
         {
-            current.state[piece+1] += movement;
+            state[(piece*2) + 1] += movement;
+            //board.movePiece(piece, movement, horizontal);
         }
-        return current;
+    }
+    boolean validBoard()
+    {
+        for(int i = 0; i < 10; i++)
+        {
+            for(int j = 0; j < 10; j++)
+            {
+                board.gridChecker[i][j] = false;
+            }
+        }
+        for(int i = 0; i < 10; i++)
+    	{
+    		board.gridChecker[0][i] = true;
+    		board.gridChecker[9][i] = true;
+    	}
+    	for(int j = 0; j < 10; j++)
+    	{
+    		board.gridChecker[j][0] = true;
+    		board.gridChecker[j][9] = true;
+    	}
+    	board.gridChecker[1][1] = true;
+        board.gridChecker[1][2] = true;
+        board.gridChecker[1][7] = true;
+        board.gridChecker[1][8] = true;
+        board.gridChecker[2][1] = true;
+        board.gridChecker[2][8] = true;
+        board.gridChecker[3][4] = true;
+        board.gridChecker[4][3] = true;
+        board.gridChecker[4][4] = true;
+        board.gridChecker[7][1] = true;
+        board.gridChecker[7][8] = true;
+        board.gridChecker[8][1] = true;
+        board.gridChecker[8][2] = true;
+        board.gridChecker[8][7] = true;
+        board.gridChecker[8][8] = true;
+        for(int i = 0; i < board.pieces.length; i++)
+        {
+        	Piece current = board.pieces[i];
+        	if(current.threeBlock)
+        	{
+        		for(int j = 0; j < 6; j+= 2)
+        		{
+        			int row = current.threeCords[j] + this.state[i * 2 + 1];
+        			int col = current.threeCords[j + 1] + this.state[i * 2];
+        			if(board.gridChecker[row][col] == false)
+        			{
+        				board.gridChecker[row][col] = true;
+        			}
+        			else if(board.gridChecker[row][col] == true)
+        			{
+        				return false;
+        			}
+        		}
+        	}
+        	else
+        	{
+        		for(int j = 0; j < 8; j += 2)
+        		{
+
+        			int row = current.fourCords[j] + (int)this.state[i * 2 + 1];
+        			int col = current.fourCords[j + 1] + (int)this.state[i * 2];
+        			if(board.gridChecker[row][col] == false)
+        				board.gridChecker[row][col] = true;
+        			else
+                    {
+        				return false;
+                    }
+        		}
+        	}
+        }
+    	return true;
+    }
+    public String stateToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < this.state.length; i++)
+        {
+            if(i % 2 == 0)
+            {
+                sb.append("(");
+                sb.append((int)this.state[i]);
+                sb.append(", ");
+            }
+            else
+            {
+                sb.append((int)this.state[i]);
+                sb.append(")");
+            }
+
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+    public LinkedList<GameState> getSuccessors()
+    {
+    	// StateComparator comp = new StateComparator();
+    	GameState current = this;
+    	LinkedList<GameState> returnSet = new LinkedList<GameState>();
+    	while(current.prev != null)
+    	{
+    		System.out.println("Addding Successors");
+    		returnSet.add(current);
+    		current = current.prev;
+    	}
+    	returnSet.add(current);
+    	return returnSet;
+    }
+    public String printWithMoves()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < board.pieces.length; i++)
+        {
+            Piece current = board.pieces[i];
+            if(current.threeBlock)
+            {
+                for(int j = 0; j < 6; j+=2)
+                {
+                    sb.append("(" + (current.threeCords[j] + this.state[i * 2 + 1]) + ", ");
+                    sb.append((current.threeCords[j + 1] + this.state[i * 2]) + ")");
+                }
+            }
+            else
+            {
+                for(int j = 0; j < 8; j+= 2)
+                {
+                    sb.append("(" + (current.fourCords[j] + this.state[i * 2 + 1]) + ", ");
+                    sb.append((current.fourCords[j + 1] + this.state[i * 2]) + ")");
+                }
+            }
+        }
+        sb.append("\n");
+        return sb.toString();
     }
     @Override
     public String toString()
@@ -550,23 +418,9 @@ class GameState
             sb.append(this.state[i] + ", ");
         }
         sb.append(this.state[21] + "\n");
+        sb.append(this.board + "\n");
         return sb.toString();
     }
-    public boolean validState()
-    {
-    	// TODO: Write function for both static standpoint and object standpoint.
-    	return this.board.validBoard();
-    }
-    // FIXME: This may or may not be needed in the future.
-//    public static boolean invalidState(GameState gs)
-//    {
-//        // Draw the board for the input state, and if valid return true.
-//    	// Change the center x, y based off the bytes.
-//    	// TODO: Gabe's Idea, write one board(static) and update it with the byte state array.
-//        if(gs.board.validBoard())
-//            return true;
-//        return false; // If GameState is false, move backwards or cannot make move.
-//    }
 }
 class StateComparator implements Comparator<GameState>
 {
@@ -580,61 +434,5 @@ class StateComparator implements Comparator<GameState>
                 return 1;
         }
         return 0;
-    }
-}
-class BFS
-{
-    TreeSet<GameState> visited; // main
-    TreeSet<GameState> openSet; // FIFO openSet, will be the set with the correct solution.
-    TreeSet<GameState> path;
-    static StateComparator comp = new StateComparator(); // Comparator to sort GameStates.
-    String result;
-    BFS(GameState init)
-    {
-    	// Initialize
-        visited = new TreeSet<GameState>(comp);
-        openSet = new TreeSet<GameState>(comp);
-        openSet.add(init);
-        while(!openSet.isEmpty())
-        {
-        	GameState subtree = openSet.first();
-        	for(int i = 0; i < 11; i++)
-        	{
-        		Piece redInPos = subtree.board.pieces[0];
-        		
-        		if((int)redInPos.fourCords[0] == 1 && (int)redInPos.fourCords[1] == 5 && (int)redInPos.fourCords[2] == 1
-        				&& (int)redInPos.fourCords[3] == 6 && (int)redInPos.fourCords[4] == 2 && (int)redInPos.fourCords[5] == 5
-        				&& (int)redInPos.fourCords[6] == 2 && (int)redInPos.fourCords[7] == 6)
-        		{
-        			this.path = openSet;
-        			break;
-        		}
-        		// TODO: Try each of the different 4 moves for each piece
-        		// Piece current = subtree.board.pieces[i];
-        		// Try to move the current piece up, down, left, and right.
-        	}
-        		// TODO: Come back to later.
-        }
-        
-        // implement BFS for GameState
-    }
-    // Function to get LinkedList of GameState path to goal.
-    LinkedList<GameState> getSuccessors(GameState leafState)
-    {
-    	LinkedList<GameState> successors = new LinkedList<GameState>();
-    	while(leafState.prev != null)
-    	{
-    		successors.add(leafState.prev);
-    		leafState = leafState.prev;
-    	}
-    	return successors;
-    }
-    String constructPath(GameState gs)
-    {
-    	return " ";
-    }
-    public TreeSet<GameState> getPath()
-    {
-        return this.path;
     }
 }
