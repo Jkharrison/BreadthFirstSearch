@@ -41,8 +41,6 @@ public class Main
     	while(!candidates.isEmpty())
     	{
     		GameState subtree = candidates.poll(); // dequeue
-            if(!subtree.validBoard())
-                throw new RuntimeException("This is broken, invalid states in queue.");
     		if(subtree.state[0] == 4 && subtree.state[1] == -2)
     		{
     			optimalPath = subtree.getSuccessors();
