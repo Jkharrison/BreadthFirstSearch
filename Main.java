@@ -10,25 +10,24 @@ public class Main
 {
     public static void main(String[] args) throws IOException
     {
-        // File file = new File("Solution.txt");
-        // if(!file.exists())
-        // {
-        //     file.createNewFile();
-        // }
-        // FileWriter fw = new FileWriter(file.getAbsoluteFile());
-        // BufferedWriter bw = new BufferedWriter(fw);
-        // bw.write(init.stateToString());
-        // bw.close();
+        File file = new File("Solution.txt");
+        if(!file.exists())
+        {
+            file.createNewFile();
+        }
+        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
         System.out.println("Welcome to my Java Breadth First Search project");
    	    GameState init = new GameState();
-        // if(init.validBoard())
-        // {
-        //     System.out.println("Valid");
-        // }
         LinkedList<GameState> result = BFS(init);
         System.out.println(result.size());
         for(int i = 0; i < result.size(); i++)
             System.out.println(result.get(i).stateToString());
+        for(int i = result.size() - 1; i >= 0; i--)
+        {
+            bw.write(result.get(i).stateToString());
+        }
+        bw.close();
         System.out.println("Algorithm is finished");
     }
     public static LinkedList<GameState> BFS(GameState init)
@@ -41,11 +40,9 @@ public class Main
     	visited.add(init);
     	while(!candidates.isEmpty())
     	{
-    		//System.out.println("Candidates size: " + candidates.size());
     		GameState subtree = candidates.poll(); // dequeue
             if(!subtree.validBoard())
                 throw new RuntimeException("This is broken, invalid states in queue.");
-            //System.out.println("Pop: " + subtree.stateToString());
     		if(subtree.state[0] == 4 && subtree.state[1] == -2)
     		{
     			optimalPath = subtree.getSuccessors();
@@ -54,50 +51,31 @@ public class Main
     		}
     		for(int i = 0; i < 11; i++)
     		{
-    			// System.out.println("Checking Piece " + i);
-                //System.out.println("Piece " + i + " " + subtree.board.pieces[i]);
-                //System.out.println(subtree.printWithMoves());
-                //System.out.println(subtree.stateToString());
                 GameState left = new GameState(subtree, -1, true, i);
-                //System.out.println(left.stateToString());
-                //System.exit(0);
     			if(left.validBoard() && !visited.contains(left))
     			{
-    				//System.out.println("Valid move for piece " + i + " to the left");
-                    //System.out.println(move.stateToString());
-                    //System.out.println("Push: " + left.stateToString());
     				candidates.add(left);
     				visited.add(left);
     			}
                 GameState right = new GameState(subtree, 1, true, i);
     			if(right.validBoard() && !visited.contains(right))
     			{
-    				//System.out.println("Valid move for piece " + i + " to the right");
-                    //System.out.println(move.stateToString());
-                    //System.out.println("Push: " + right.stateToString());
     				candidates.add(right);
     				visited.add(right);
     			}
                 GameState up = new GameState(subtree, -1, false, i);
     			if(up.validBoard() && !visited.contains(up))
     			{
-    				//System.out.println("Valid move for piece " + i + " up");
-                    //System.out.println(move.stateToString());
-                    //System.out.println("Push: " + up.stateToString());
     				candidates.add(up);
     				visited.add(up);
     			}
                 GameState down = new GameState(subtree, 1, false, i);
     			if(down.validBoard() && !visited.contains(down))
     			{
-    				//System.out.println("Valid move for piece " + i + " down");
-                    //System.out.println(move.stateToString());
-                    //System.out.println("Push: " + down.stateToString());
     				candidates.add(down);
     				visited.add(down);
     			}
     		}
-    		//visited.add(subtree);
     	}
     	return optimalPath;
     }
@@ -151,27 +129,6 @@ class Piece
         fourCords[5] = (byte)f;
         fourCords[6] = (byte)g;
         fourCords[7] = (byte)h;
-    }
-    Piece(Piece p) // Copy Constructor
-    {
-    	this.threeBlock = p.threeBlock;
-    	if(p.threeBlock)
-    	{
-    		this.threeCords = new byte[6];
-    		for(int i = 0; i < threeCords.length; i++)
-    		{
-    			this.threeCords[i] = p.threeCords[i];
-    		}
-    	}
-    	else
-    	{
-    		this.fourCords = new byte[8];
-    		for(int i = 0; i < fourCords.length; i++)
-    		{
-    			this.fourCords[i] = p.fourCords[i];
-    		}
-    	}
-
     }
     @Override
 	public String toString()
@@ -323,7 +280,6 @@ class GameState
                 sb.append((int)this.state[i]);
                 sb.append(")");
             }
-
         }
         sb.append("\n");
         return sb.toString();
