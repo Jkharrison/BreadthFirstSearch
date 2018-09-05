@@ -10,7 +10,7 @@ public class Main
 {
     public static void main(String[] args) throws IOException
     {
-        File file = new File("Solution.txt");
+        File file = new File("results.txt");
         if(!file.exists())
         {
             file.createNewFile();
@@ -20,12 +20,12 @@ public class Main
         System.out.println("Welcome to my Java Breadth First Search project");
    	    GameState init = new GameState();
         LinkedList<GameState> result = BFS(init);
+        LinkedList<GameState> reversedResult = new LinkedList<GameState>();
         System.out.println(result.size());
-        for(int i = 0; i < result.size(); i++)
-            System.out.println(result.get(i).stateToString());
         for(int i = result.size() - 1; i >= 0; i--)
         {
             bw.write(result.get(i).stateToString());
+            reversedResult.add(result.get(i));
         }
         bw.close();
         System.out.println("Algorithm is finished");
@@ -82,7 +82,6 @@ class Board
 {
     static Piece[] pieces = new Piece[11];
     static boolean[][] gridChecker = new boolean[10][10];
-
     Board()
     {
         pieces[0] = new Piece(3, 1, 3, 2, 4, 1, 4, 2, 0);
@@ -197,26 +196,26 @@ class GameState
         else
             state[(piece*2) + 1] += movement;
     }
-    boolean validBoard()
+    boolean validBoard() // Loop through all locations on board, check if not drawing twice or overlapping.
     {
         for(int i = 0; i < 10; i++)
         {
             for(int j = 0; j < 10; j++)
             {
-                board.gridChecker[i][j] = false;
+                board.gridChecker[i][j] = false; // Make sure all grid locations are false before validation.
             }
         }
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 10; i++) // Perimeter pieces.
     	{
     		board.gridChecker[0][i] = true;
     		board.gridChecker[9][i] = true;
     	}
-    	for(int j = 0; j < 10; j++)
+    	for(int j = 0; j < 10; j++) // Perimeter pieces.
     	{
     		board.gridChecker[j][0] = true;
     		board.gridChecker[j][9] = true;
     	}
-    	board.gridChecker[1][1] = true;
+    	board.gridChecker[1][1] = true; // All of the non-perimeter pieces
         board.gridChecker[1][2] = true;
         board.gridChecker[1][7] = true;
         board.gridChecker[1][8] = true;
@@ -231,7 +230,7 @@ class GameState
         board.gridChecker[8][2] = true;
         board.gridChecker[8][7] = true;
         board.gridChecker[8][8] = true;
-        for(int i = 0; i < board.pieces.length; i++)
+        for(int i = 0; i < board.pieces.length; i++) // Loop through colored pieces.
         {
         	Piece current = board.pieces[i];
         	if(current.threeBlock)
@@ -262,7 +261,7 @@ class GameState
         }
     	return true;
     }
-    public String stateToString()
+    public String stateToString() // Method to print the state byte array for each respective GameState
     {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < this.state.length; i++)
@@ -282,20 +281,19 @@ class GameState
         sb.append("\n");
         return sb.toString();
     }
-    public LinkedList<GameState> getSuccessors()
+    public LinkedList<GameState> getSuccessors() // Method to get all parents of state passed in.
     {
     	GameState current = this;
     	LinkedList<GameState> returnSet = new LinkedList<GameState>();
     	while(current.prev != null)
     	{
-    		//System.out.println("Addding Successors");
     		returnSet.add(current);
     		current = current.prev;
     	}
     	returnSet.add(current);
     	return returnSet;
     }
-    public String printWithMoves()
+    public String printWithMoves() // Method to (x, y) locations from initial piece location and state moves.
     {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < board.pieces.length; i++)
@@ -322,7 +320,7 @@ class GameState
         return sb.toString();
     }
     @Override
-    public String toString()
+    public String toString() // Helper method to print variables, useful for debugging.
     {
         StringBuilder sb = new StringBuilder();
         sb.append("State values: ");
@@ -333,7 +331,7 @@ class GameState
         return sb.toString();
     }
 }
-class StateComparator implements Comparator<GameState>
+class StateComparator implements Comparator<GameState> // What the TreeSet using to sort GameState objects.
 {
     public int compare(GameState a, GameState b)
     {
